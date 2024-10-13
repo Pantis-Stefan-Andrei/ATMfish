@@ -1,0 +1,387 @@
+{{define "body"}}
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  <div class="row">
+    <h1 class="page-header">Email Templates</h1>
+  </div>
+  <div id="flashes" class="row"></div>
+  <div class="row">
+    <button
+      type="button"
+      class="btn btn-primary"
+      onclick="edit(-1)"
+      data-toggle="modal"
+      data-backdrop="static"
+      data-target="#modal"
+    >
+      <i class="fa fa-plus"></i> New Template
+    </button>
+  </div>
+  &nbsp;
+  <div id="loading">
+    <i class="fa fa-spinner fa-spin fa-4x"></i>
+  </div>
+  <div id="emptyMessage" class="row" style="display: none">
+    <div class="alert alert-info">No templates yet. Let's create one!</div>
+  </div>
+  <div class="row">
+    <table id="templateTable" class="table" style="display: none">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Modified Date</th>
+          <th class="col-md-2 no-sort"></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="modal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="modalLabel"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <!-- New Template Modal -->
+      <div class="modal-header">
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+          onclick="dismiss()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="templateModalLabel">New Template</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row" id="modal.flashes"></div>
+        <label class="control-label" for="name">Name:</label>
+        <div class="form-group">
+          <input
+            type="text"
+            class="form-control"
+            ng-model="template.name"
+            placeholder="Template name"
+            id="name"
+            autofocus
+          />
+        </div>
+        <div class="form-group">
+          <button
+            class="btn btn-danger"
+            data-toggle="modal"
+            data-backdrop="static"
+            data-target="#importEmailModal"
+          >
+            <i class="fa fa-envelope"></i> Import Email
+          </button>
+        </div>
+        <label class="control-label" for="envelope-sender"
+          >Envelope Sender:
+          <i
+            class="fa fa-question-circle"
+            data-toggle="tooltip"
+            data-placement="right"
+            title="This sender is shown to the user by most email clients. Defaults to the SMTP From as defined in the Sending Profile."
+          ></i
+        ></label>
+        <div class="form-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="First Last <test@example.com>"
+            id="envelope-sender"
+          />
+        </div>
+        <label class="control-label" for="subject">Subject:</label>
+        <div class="form-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Email Subject"
+            id="subject"
+          />
+        </div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="active" role="text">
+            <a
+              href="#text"
+              aria-controls="text"
+              role="tab"
+              data-toggle="tab"
+              onclick="toggleFields('text')"
+              >Text</a
+            >
+          </li>
+          <li role="html">
+            <a
+              href="#html"
+              aria-controls="html"
+              role="tab"
+              data-toggle="tab"
+              onclick="toggleFields('html')"
+              >HTML</a
+            >
+          </li>
+          <li role="AI_G">
+            <a
+              href="#AI_G"
+              aria-controls="AI_G"
+              role="tab"
+              data-toggle="tab"
+              onclick="toggleFields('AI')"
+              >Generare AI</a
+            >
+          </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="text">
+            <textarea
+              rows="10"
+              id="text_editor"
+              class="gophish-editor form-control"
+              placeholder="Plaintext"
+            ></textarea>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="html">
+            <textarea id="html_editor"></textarea>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="AI_G">
+            <!-- AI Fields -->
+            <div id="aiFields" style="display: none">
+              <div class="form-group"></div>
+              <div class="form-group">
+                <label for="destinatar_input">Destinatar:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="destinatar_input"
+                  placeholder="Introduceți destinatarul"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="lungime_input">Lungime (număr de caractere):</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="lungime_input"
+                  value="200"
+                />
+              </div>
+              <div class="form-group">
+                <label for="tip_input">Tip de email:</label>
+                <select id="tip_input" class="form-control">
+                  <option value="Formal">Formal</option>
+                  <option value="Informal">Informal</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="emoji_input">Folosiți emoji-uri?</label>
+                <input type="checkbox" id="emoji_input" />
+              </div>
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="trimiteDate()"
+              >
+                Generează Email
+              </button>
+            </div>
+
+            <!-- Zona pentru a afișa rezultatul textului generat -->
+            <div id="aiResult" style="margin-top: 20px; display: none">
+              <h4>Rezultatul Generării:</h4>
+              <p id="aiResultText"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkbox checkbox-primary">
+          <input id="use_tracker_checkbox" type="checkbox" checked />
+          <label for="use_tracker_checkbox">Add Tracking Image</label>
+        </div>
+        <span class="btn btn-danger btn-file"
+          ><i class="fa fa-plus"></i> Add Files
+          <input
+            id="attachmentUpload"
+            type="file"
+            onchange="attach(this.files)"
+            multiple
+          />
+        </span>
+        <br />
+        <br />
+        <table id="attachmentsTable" class="table">
+          <thead>
+            <tr>
+              <th class="col-md-1 no-sort"></th>
+              <th class="col-md-10">Name</th>
+              <th class="col-md-1 no-sort"></th>
+              <th class="datatable_hidden no-sort">Content</th>
+              <th class="datatable_hidden no-sort">Type</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <hr />
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          data-dismiss="modal"
+          class="btn btn-default"
+          onclick="dismiss()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="modalSubmit">
+          Save Template
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="importEmailModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="modalLabel"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <!-- New Email Modal -->
+      <div class="modal-header">
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="importEmailModalLabel">Import Email</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row" id="modal.flashes"></div>
+        <label class="control-label" for="email">Email Content:</label>
+        <div class="form-group">
+          <textarea
+            rows="10"
+            id="email_content"
+            class="gophish-editor form-control"
+            placeholder="Raw Email Source"
+          ></textarea>
+        </div>
+        <div class="checkbox checkbox-primary">
+          <input id="convert_links_checkbox" type="checkbox" checked />
+          <label for="convert_links_checkbox"
+            >Change Links to Point to Landing Page</label
+          >
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-default">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="modalSubmit"
+          onclick="importEmail()"
+        >
+          Import
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}} {{define "scripts"}}
+<script src="/js/src/vendor/ckeditor/ckeditor.js"></script>
+<script src="/js/src/vendor/ckeditor/adapters/jquery.js"></script>
+<script src="/js/dist/app/autocomplete.min.js"></script>
+<script src="/js/dist/app/templates.min.js"></script>
+<script>
+  function toggleFields(selectedTab) {
+    // Hide all sections first
+    document.getElementById("text_editor").parentElement.style.display = "none";
+    document.getElementById("html_editor").parentElement.style.display = "none";
+    document.getElementById("aiFields").style.display = "none";
+    document.getElementById("aiResult").style.display = "none"; // Hide AI result as well initially
+
+    if (selectedTab === "text") {
+      document.getElementById("text_editor").parentElement.style.display =
+        "block";
+    } else if (selectedTab === "html") {
+      document.getElementById("html_editor").parentElement.style.display =
+        "block";
+    } else if (selectedTab === "AI") {
+      document.getElementById("aiFields").style.display = "block";
+    }
+  }
+
+  function trimiteDate() {
+    var expeditor = document.getElementById("envelope-sender").value;
+    var destinatar = document.getElementById("destinatar_input").value;
+    var subiect = document.getElementById("subject").value;
+    var lungime = document.getElementById("lungime_input").value;
+    var tip = document.getElementById("tip_input").value;
+    var folosesteEmoji = document.getElementById("emoji_input").checked;
+
+    console.log("Trimitere date:", {
+      expeditor,
+      destinatar,
+      subiect,
+      lungime,
+      tip,
+      folosesteEmoji,
+    });
+
+    var date = {
+      expeditor: expeditor,
+      destinatar: destinatar,
+      subiect: subiect,
+      lungime: lungime,
+      tip: tip,
+      folosesteEmoji: folosesteEmoji,
+    };
+
+    fetch("http://127.0.0.1:5000/generate_gemini_email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(date),
+    })
+      .then((response) => {
+        console.log("Răspuns primit:", response);
+        if (!response.ok) {
+          throw new Error("Răspuns de la server nu este ok.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Date primite de la server:", data);
+        document.getElementById("text_editor").innerText = data;
+        document.getElementById("aiResultText").innerText = data.email;
+        document.getElementById("aiResult").style.display = "block";
+      })
+      .catch((error) => {
+        console.error("Eroare la trimiterea datelor:", error);
+        alert("A apărut o eroare la trimiterea datelor.");
+      });
+  }
+</script>
+{{end}}

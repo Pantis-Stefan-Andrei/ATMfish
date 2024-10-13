@@ -1,0 +1,41 @@
+{
+	"pid": 4134,
+	"problem_type": {
+		"list": [{
+			"value": 114,
+			"type": "",
+			"sort": 1,
+			"title": "The software crashed or froze.",
+			"banner_url": "https:\/\/wae.wondershare.cc\/Recoverit_Uninstaller\/Option1.png",
+			"banner_title": "The new version can solve most problems, do you need to update it?",
+			"extend": "{\"button_type\":\" upgrade\"}",
+			"button_name": "Upgrade",
+			"placeholder": "",
+			"banner_click_url": ""
+		}, {
+			"value": 121,
+			"type": "",
+			"sort": 2,
+			"title": "I want to uninstall the old version before reinstalling it.",
+			"banner_url": "https:\/\/wae.wondershare.cc\/Recoverit_Uninstaller\/Option3.png",
+			"banner_title": "Thank you for using! See you soon!",
+			"extend": "",
+			"button_name": "",
+			"placeholder": "",
+			"banner_click_url": ""
+		}, {
+			"value": 122,
+			"type": "",
+			"sort": 3,
+			"title": "I didn't find it user-friendly.",
+			"banner_url": "https:\/\/wae.wondershare.cc\/Recoverit_Uninstaller\/Option4.png",
+			"banner_title": "We will continue to optimize our products and look forward to seeing you again.",
+			"extend": "",
+			"button_name": "",
+			"placeholder": "",
+			"banner_click_url": ""
+		}, {
+			"value": 124,
+			"type": "",
+			"sort": 4,
+			"title": "Did not detect my disk\/dev
